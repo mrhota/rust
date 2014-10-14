@@ -1352,6 +1352,64 @@ impl LintPass for UnusedMut {
     }
 }
 
+declare_lint!(pub SHADOWED_NAME, Allow,
+              "detects declarations which shadow names from enclosing scopes")
+
+pub struct ShadowedName;
+
+impl LintPass for ShadowedName {
+    fn get_lints(&self) -> LintArray {
+        lint_array!(SHADOWED_NAME)
+    }
+
+    fn check_pat(&mut self, cx: &Context, p: &ast::Pat) {
+        match &p.node {
+            &ast::PatIdent(_, ref spanned_ident, _) => {
+                // this identifier needs to be compared with idents
+                // in each enclosing scope (right?)
+                let ident_as_str = spanned_ident.node.as_str();
+                let mut enclosing = cx.tcx.region_maps.opt_encl_scope(p.id)
+                                                      .unwrap_or(p.id);
+
+                while enclosing != p.id {
+                    match cx.tcx.map.find(enclosing) {
+                        Some(ast_map::NodeBlock(block)) => {
+                            for ref spanned_stmt in block.stmts.iter() {
+                                match spanned_stmt.node {
+                                    ast::StmtDecl(ref decl, stmt_id) => {
+                                        match decl.node {
+                                            ast::DeclLocal(ref local) => {
+                                                match local.pat.node {
+                                                    ast::PatIdent(_, ref other_ident, _) => {
+                                                        if other_ident.node.as_str() == ident_as_str {
+                                                            cx.span_lint(SHADOWED_NAME, cx.tcx.map.span(local.pat.id),
+                                                                         "name shadowed here");
+                                                        }
+                                                    },
+                                                    _ => {}
+                                                };
+                                            },
+                                            _ => {}
+                                        };
+                                    },
+                                    ast::StmtExpr(ref expr, stmt_id) |
+                                    ast::StmtSemi(ref expr, stmt_id) => {
+                                    },
+                                    _ => {}
+                                }
+                            }
+                        },
+                        _ => {}
+                    };
+                    enclosing = cx.tcx.region_maps.opt_encl_scope(enclosing)
+                                                  .unwrap_or(p.id);
+                }
+            },
+            _ => {}
+        };
+    }
+}
+
 declare_lint!(UNUSED_ALLOCATION, Warn,
               "detects unnecessary allocations that can be eliminated")
 

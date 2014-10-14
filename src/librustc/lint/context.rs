@@ -206,6 +206,7 @@ impl LintStore {
                      UnusedUnsafe,
                      UnsafeBlocks,
                      UnusedMut,
+                     ShadowedName,
                      UnusedAllocation,
                      Stability,
         )
@@ -217,7 +218,7 @@ impl LintStore {
         )
 
         add_lint_group!(sess, "bad_style",
-                        NON_CAMEL_CASE_TYPES, NON_SNAKE_CASE, NON_UPPER_CASE_GLOBALS)
+                        NON_CAMEL_CASE_TYPES, NON_SNAKE_CASE, NON_UPPER_CASE_GLOBALS, SHADOWED_NAME)
 
         add_lint_group!(sess, "unused",
                         UNUSED_IMPORTS, UNUSED_VARIABLES, UNUSED_ASSIGNMENTS, DEAD_CODE,
