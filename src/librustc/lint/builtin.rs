@@ -34,6 +34,7 @@ use middle::const_eval::{eval_const_expr_partial, const_int, const_uint};
 use util::ppaux::{ty_to_string};
 use util::nodemap::NodeSet;
 use lint::{Context, LintPass, LintArray};
+use lint;
 
 use std::cmp;
 use std::collections::HashMap;
@@ -1355,6 +1356,50 @@ impl LintPass for UnusedMut {
 declare_lint!(pub SHADOWED_NAME, Allow,
               "detects declarations which shadow names from enclosing scopes")
 
+struct ShadowedNameVisitor<'a, 'tcx: 'a> {
+    cx: &'a Context<'a, 'tcx>,
+    shadowed_names: HashMap<ast::Name, ast::NodeId>,
+}
+
+// visits the whole crate, looking for shadowed names in Pat nodes
+impl<'a, 'tcx, 'v> Visitor<'v> for ShadowedNameVisitor<'a, 'tcx> {
+    fn visit_pat(&mut self, p: &ast::Pat) {
+        match p.node {
+            ast::PatIdent(_, spannedident, Some(_)) => {
+                let name = spannedident.node.name;
+
+                match self.shadowed_names.entry(name) {
+                    Vacant(entry) => {
+                        entry.set(p.id);
+                    },
+                    Occupied(entry) => {
+                        // name is potentially shadowing something!
+                        let ref rmap = self.cx.tcx.region_maps;
+                        let ref cx = self.cx;
+                        let &id = entry.get();
+                        let firstscope = rmap.encl_scope(id);
+                        let secondscope = rmap.encl_scope(p.id);
+
+                        if rmap.is_subscope_of(secondscope, firstscope) {
+                            cx.span_lint(SHADOWED_NAME, cx.tcx.map.span(id),
+                                         format!("{} is shadowed",
+                                                 token::get_name(name)).as_slice());
+                            let lev = cx.current_level(SHADOWED_NAME);
+                            if lev > lint::Allow {
+                                span_note!(cx.sess(), p.span, "{} shadowed here",
+                                           token::get_name(name));
+                            }
+                        }
+                    },
+                }
+            },
+            _ => {},
+        }
+
+        visit::walk_pat(self, p);
+    }
+}
+
 pub struct ShadowedName;
 
 impl LintPass for ShadowedName {
@@ -1362,51 +1407,12 @@ impl LintPass for ShadowedName {
         lint_array!(SHADOWED_NAME)
     }
 
-    fn check_pat(&mut self, cx: &Context, p: &ast::Pat) {
-        match &p.node {
-            &ast::PatIdent(_, ref spanned_ident, _) => {
-                // this identifier needs to be compared with idents
-                // in each enclosing scope (right?)
-                let ident_as_str = spanned_ident.node.as_str();
-                let mut enclosing = cx.tcx.region_maps.opt_encl_scope(p.id)
-                                                      .unwrap_or(p.id);
-
-                while enclosing != p.id {
-                    match cx.tcx.map.find(enclosing) {
-                        Some(ast_map::NodeBlock(block)) => {
-                            for ref spanned_stmt in block.stmts.iter() {
-                                match spanned_stmt.node {
-                                    ast::StmtDecl(ref decl, stmt_id) => {
-                                        match decl.node {
-                                            ast::DeclLocal(ref local) => {
-                                                match local.pat.node {
-                                                    ast::PatIdent(_, ref other_ident, _) => {
-                                                        if other_ident.node.as_str() == ident_as_str {
-                                                            cx.span_lint(SHADOWED_NAME, cx.tcx.map.span(local.pat.id),
-                                                                         "name shadowed here");
-                                                        }
-                                                    },
-                                                    _ => {}
-                                                };
-                                            },
-                                            _ => {}
-                                        };
-                                    },
-                                    ast::StmtExpr(ref expr, stmt_id) |
-                                    ast::StmtSemi(ref expr, stmt_id) => {
-                                    },
-                                    _ => {}
-                                }
-                            }
-                        },
-                        _ => {}
-                    };
-                    enclosing = cx.tcx.region_maps.opt_encl_scope(enclosing)
-                                                  .unwrap_or(p.id);
-                }
-            },
-            _ => {}
+    fn check_crate(&mut self, cx: &Context, krate: &ast::Crate) {
+        let mut vis = ShadowedNameVisitor {
+            cx: cx,
+            shadowed_names: HashMap::new()
         };
+        visit::walk_crate(&mut vis, krate);
     }
 }
 
