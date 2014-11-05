@@ -9,11 +9,11 @@
 // except according to those terms.
 
 #![forbid(shadowed_name)]
-#![allow(unused_variable)]
+#![allow(unused_variables)]
 
 pub fn main() {
     let foo = 0i;
     {
-        let foo = Some(2.0f64); //~ ERROR name shadowed here
+        let foo = Some(2.0f64); //~ ERROR foo is shadowed
     }
 }
