@@ -1377,10 +1377,10 @@ impl<'a, 'tcx, 'v> Visitor<'v> for ShadowedNameVisitor<'a, 'tcx> {
                         let ref rmap = self.cx.tcx.region_maps;
                         let ref cx = self.cx;
                         let &id = entry.get();
-                        let firstscope = rmap.encl_scope(id);
-                        let secondscope = rmap.encl_scope(p.id);
+                        let origscope = rmap.encl_scope(id);
+                        let thisscope = rmap.encl_scope(p.id);
 
-                        if rmap.is_subscope_of(secondscope, firstscope) {
+                        if origscope != thisscope && rmap.is_subscope_of(thisscope, origscope) {
                             cx.span_lint(SHADOWED_NAME, cx.tcx.map.span(id),
                                          format!("{} is shadowed",
                                                  token::get_name(name)).as_slice());
