@@ -1,26 +1,26 @@
 % The Rust Guide
 
-Hey there! Welcome to the Rust guide. This is the place to be if you'd like to
+Welcome to the Rust guide. This is the place to be if you'd like to
 learn how to program in Rust. Rust is a systems programming language with a
-focus on "high-level, bare-metal programming": the lowest level control a
+focus on "high-level, bare-metal programming": the lowest level of control a
 programming language can give you, but with zero-cost, higher level
 abstractions, because people aren't computers. We really think Rust is
 something special, and we hope you do too.
 
 To show you how to get going with Rust, we're going to write the traditional
-"Hello, World!" program. Next, we'll introduce you to a tool that's useful for
-writing real-world Rust programs and libraries: "Cargo." After that, we'll talk
-about the basics of Rust, write a little program to try them out, and then learn
-more advanced things.
+"Hello, World!" program. Next, we'll introduce you to `cargo`, a tool that's
+useful for writing real-world Rust programs and libraries. After that, we'll
+talk about the basics of Rust and write a little program to try them out, and
+then we'll move on to more advanced things.
 
-Sound good? Let's go!
+Let's go!
 
 # Installing Rust
 
-The first step to using Rust is to install it! There are a number of ways to
-install Rust, but the easiest is to use the `rustup` script. If you're on
-Linux or a Mac, all you need to do is this (note that you don't need to type
-in the `$`s, they just indicate the start of each command):
+Our first step is to install Rust. There are a number of ways to do this,
+but the easiest is to use the `rustup` script. If you're on Linux or a Mac,
+all you need to do is this (you don't need to type in the `$`s; they
+indicate the start of a command):
 
 ```{ignore}
 $ curl -s https://static.rust-lang.org/rustup.sh | sudo sh
@@ -29,38 +29,17 @@ $ curl -s https://static.rust-lang.org/rustup.sh | sudo sh
 (If you're concerned about `curl | sudo sh`, please keep reading. Disclaimer
 below.)
 
+You can re-run this script any time you want to update Rust. Rust is still
+pre-1.0, so you should update often. If you seek help in online forums like
+Reddit or IRC, people will assume that you're using a very recent Rust.
+
 If you're on Windows, please download either the [32-bit
 installer](https://static.rust-lang.org/dist/rust-nightly-i686-w64-mingw32.exe)
 or the [64-bit
 installer](https://static.rust-lang.org/dist/rust-nightly-x86_64-w64-mingw32.exe)
 and run it.
 
-If you decide you don't want Rust anymore, we'll be a bit sad, but that's okay.
-Not every programming language is great for everyone. Just pass an argument to
-the script:
-
-```{ignore}
-$ curl -s https://static.rust-lang.org/rustup.sh | sudo sh -s -- --uninstall
-```
-
-If you used the Windows installer, just re-run the `.exe` and it will give you
-an uninstall option.
-
-You can re-run this script any time you want to update Rust. Which, at this
-point, is often. Rust is still pre-1.0, and so people assume that you're using
-a very recent Rust.
-
-This brings me to one other point: some people, and somewhat rightfully so, get
-very upset when we tell you to `curl | sudo sh`. And they should be! Basically,
-when you do this, you are trusting that the good people who maintain Rust
-aren't going to hack your computer and do bad things. That's a good instinct!
-If you're one of those people, please check out the documentation on [building
-Rust from Source](https://github.com/rust-lang/rust#building-from-source), or
-[the official binary downloads](http://www.rust-lang.org/install.html). And we
-promise that this method will not be the way to install Rust forever: it's just
-the easiest way to keep people updated while Rust is in its alpha state.
-
-Oh, we should also mention the officially supported platforms:
+We should also mention the officially supported platforms:
 
 * Windows (7, 8, Server 2008 R2)
 * Linux (2.6.18 or later, various distributions), x86 and x86-64
@@ -69,6 +48,31 @@ Oh, we should also mention the officially supported platforms:
 We extensively test Rust on these platforms, and a few others, too, like
 Android. But these are the ones most likely to work, as they have the most
 testing.
+
+### Uninstalling Rust
+
+If you decide you don't want Rust anymore, just pass an argument to the script:
+
+```{ignore}
+$ curl -s https://static.rust-lang.org/rustup.sh | sudo sh -s -- --uninstall
+```
+
+If you used the Windows installer, just re-run the `.exe`, and it will give you
+an uninstall option.
+
+### Disclaimer
+
+This brings me to one other point: some people, and somewhat rightfully so, get
+very upset when we tell you to `curl | sudo sh`. And they should be! Basically,
+when you do this, you are trusting that the good people who maintain Rust
+aren't going to hack your computer and do bad things. If you're one of those
+skeptical people, please check out the documentation on [building Rust from
+Source](https://github.com/rust-lang/rust#building-from-source), or [the official
+binary downloads](http://www.rust-lang.org/install.html). And we
+promise that this method will not be the way to install Rust forever: it's just
+the easiest way to keep people updated while Rust is in its alpha state.
+
+### A Word About Windows
 
 Finally, a comment about Windows. Rust considers Windows to be a first-class
 platform upon release, but if we're honest, the Windows experience isn't as
@@ -90,7 +94,9 @@ rustc 0.12.0-nightly (b7aa03a3c 2014-09-28 11:38:01 +0000)
 
 If you did, Rust has been installed successfully! Congrats!
 
-If not, there are a number of places where you can get help. The easiest is
+### Troubleshooting Installation
+
+There are a number of places where you can get help. The easiest is
 [the #rust IRC channel on irc.mozilla.org](irc://irc.mozilla.org/#rust), which
 you can access through
 [Mibbit](http://chat.mibbit.com/?server=irc.mozilla.org&channel=%23rust). Click
