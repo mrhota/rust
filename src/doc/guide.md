@@ -823,7 +823,6 @@ that we haven't learned about yet, so we'l leave it at that for now.
 
 # Comments
 
-Now that we have some functions, it's a good idea to learn about comments.
 Comments are notes that you leave to other programmers to help explain things
 about your code. The compiler mostly ignores them.
 
@@ -863,21 +862,21 @@ fn hello(name: &str) {
 ```
 
 When writing doc comments, adding sections for any arguments, return values,
-and providing some examples of usage is very, very helpful.
+and providing some examples of usage is very helpful.
 
 You can use the `rustdoc` tool to generate HTML documentation from these doc
-comments. We will talk more about `rustdoc` when we get to modules, as
-generally, you want to export documentation for a full module.
+comments. We will talk more about `rustdoc` when we get to modules, since you'll
+generally want to export documentation for a full module.
 
 # Compound Data Types
 
-Rust, like many programming languages, has a number of different data types
-that are built-in. You've already done some simple work with integers and
-strings, but next, let's talk about some more complicated ways of storing data.
+Rust, like many programming languages, has a number of different data types that
+are built-in. We've already done some simple work with integers and
+strings. Next, we'll talk about more complicated ways of representing data.
 
 ## Tuples
 
-The first compound data type we're going to talk about are called **tuple**s.
+The first compound data types we're going to talk about are called **tuple**s.
 Tuples are an ordered list of a fixed size. Like this:
 
 ```rust
@@ -891,13 +890,13 @@ with the type annotated:
 let x: (int, &str) = (1, "hello");
 ```
 
-As you can see, the type of a tuple looks just like the tuple, but with each
-position having a type name rather than the value. Careful readers will also
-note that tuples are heterogeneous: we have an `int` and a `&str` in this tuple.
-You haven't seen `&str` as a type before, and we'll discuss the details of
-strings later. In systems programming languages, strings are a bit more complex
-than in other languages. For now, just read `&str` as "a string slice," and
-we'll learn more soon.
+The type of a tuple looks like the tuple itself, but with types in
+place of values in each position. Careful readers will also note that
+tuples are heterogeneous: we have an `int` and a `&str` in this tuple.
+You haven't seen `&str` as a type before, but we'll discuss the
+details later. In systems programming languages, strings are a bit
+more complex than in other languages. For now, just read `&str` as "a
+string slice."
 
 You can access the fields in a tuple through a **destructuring let**. Here's
 an example:
@@ -908,13 +907,13 @@ let (x, y, z) = (1i, 2i, 3i);
 println!("x is {}", x);
 ```
 
-Remember before when I said the left-hand side of a `let` statement was more
-powerful than just assigning a binding? Here we are. We can put a pattern on
-the left-hand side of the `let`, and if it matches up to the right-hand side,
-we can assign multiple bindings at once. In this case, `let` 'destructures,'
-or 'breaks up,' the tuple, and assigns the bits to three bindings.
+Remember our prior discussion that the left side of a `let` statement was more
+powerful than just creating a binding? We can put a pattern on the left side of
+the `let`, and if it "matches" the right side, we can assign multiple bindings
+at once. In this case, `let` "destructures" or "breaks up" the right tuple and
+binds the values of the pieces to the three identifiers on the left.
 
-This pattern is very powerful, and we'll see it repeated more later.
+This capability is very powerful, and we'll see it repeated more later.
 
 There are also a few things you can do with a tuple as a whole, without
 destructuring. You can assign one tuple into another, if they have the same
@@ -943,7 +942,7 @@ if x == y {
 
 This will print `no`, because some of the values aren't equal.
 
-One other use of tuples is to return multiple values from a function:
+One other use of tuples is to return "multiple values" from a function:
 
 ```rust
 fn next_two(x: int) -> (int, int) { (x + 1i, x + 2i) }
@@ -954,18 +953,18 @@ fn main() {
 }
 ```
 
-Even though Rust functions can only return one value, a tuple _is_ one value,
-that happens to be made up of two. You can also see in this example how you
-can destructure a pattern returned by a function, as well.
+A tuple _is_ a single value, but it happens to contain one or more other
+values. You can also see in this example how you can destructure a pattern
+returned by a function, as well.
 
-Tuples are a very simple data structure, and so are not often what you want.
-Let's move on to their bigger sibling, structs.
+Tuples are a simple data structure, so they are not frequently useful. Structs,
+on the other hand, allow for more flexible abstractions.
 
 ## Structs
 
-A struct is another form of a 'record type,' just like a tuple. There's a
-difference: structs give each element that they contain a name, called a
-'field' or a 'member.' Check it out:
+Structs give each element that they contain a name, where a tuple's elements are
+unnamed and positional. An element of a struct is called a 'field' or a
+'member.' Here's a simple example with two fields, `x` and `y`:
 
 ```rust
 struct Point {
@@ -980,19 +979,20 @@ fn main() {
 }
 ```
 
-There's a lot going on here, so let's break it down. We declare a struct with
-the `struct` keyword, and then with a name. By convention, structs begin with a
-capital letter and are also camel cased: `PointInSpace`, not `Point_In_Space`.
+To begin with, we declare a struct with the `struct` keyword followed by a
+name. By convention, structs begin with a capital letter and are camel cased:
+`PointInSpace`; not `Point_In_Space`.
 
 We can create an instance of our struct via `let`, as usual, but we use a `key:
-value` style syntax to set each field. The order doesn't need to be the same as
-in the original declaration.
+value` style syntax to initialize each field. The order doesn't need to be the
+same as in the original declaration. This style will be familiar to Javascript
+or Python programmers, for example.
 
 Finally, because fields have names, we can access the field through dot
 notation: `origin.x`.
 
-The values in structs are immutable, like other bindings in Rust. However, you
-can use `mut` to make them mutable:
+Like other `let` bindings, instances of structs are immutably bound to
+variables. However, you can use `mut` to make them mutable:
 
 ```{rust}
 struct Point {
@@ -1017,20 +1017,20 @@ Rust has another data type that's like a hybrid between a tuple and a struct,
 called a **tuple struct**. Tuple structs do have a name, but their fields
 don't:
 
-
 ```{rust}
 struct Color(int, int, int);
 struct Point(int, int, int);
+
+fn main() {
+    let black  = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
 ```
 
-These two will not be equal, even if they have the same values:
+They are not equal even though their elements are equal. They can't be compared
+because they're different types.
 
-```{rust,ignore}
-let black  = Color(0, 0, 0);
-let origin = Point(0, 0, 0);
-```
-
-It is almost always better to use a struct than a tuple struct. We would write
+It is almost always better to use a struct than a tuple struct. We could define
 `Color` and `Point` like this instead:
 
 ```{rust}
@@ -1047,8 +1047,8 @@ struct Point {
 }
 ```
 
-Now, we have actual names, rather than positions. Good names are important,
-and with a struct, we have actual names.
+Now we have named fields, rather than positions. For your own sanity, use
+descriptive field and variable names.
 
 There _is_ one case when a tuple struct is very useful, though, and that's a
 tuple struct with only one element. We call this a 'newtype,' because it lets
@@ -1068,9 +1068,11 @@ destructuring `let`.
 
 ## Enums
 
-Finally, Rust has a "sum type", an **enum**. Enums are an incredibly useful
-feature of Rust, and are used throughout the standard library. This is an enum
-that is provided by the Rust standard library:
+Finally, Rust has a
+[sum type](https://en.wikipedia.org/wiki/Tagged_union) called an
+**enum**. Enums are an incredibly useful feature of Rust and are used
+throughout the standard library. Here's an example provided by the
+Rust standard library:
 
 ```{rust}
 enum Ordering {
@@ -1080,7 +1082,7 @@ enum Ordering {
 }
 ```
 
-An `Ordering` can only be _one_ of `Less`, `Equal`, or `Greater` at any given
+An instance of `Ordering` can only be _one_ of `Less`, `Equal`, or `Greater` at any given
 time. Here's an example:
 
 ```{rust}
@@ -1107,19 +1109,17 @@ fn main() {
 ```
 
 `cmp` is a function that compares two things, and returns an `Ordering`. We
-return either `Less`, `Greater`, or `Equal`, depending on if the two values
-are greater, less, or equal.
+return either `Less`, `Greater`, or `Equal`, as expected.
 
-The `ordering` variable has the type `Ordering`, and so contains one of the
-three values. We can then do a bunch of `if`/`else` comparisons to check
-which one it is.
+The `ordering` variable has the type `Ordering`, so its value is one of the
+three variants. We can perform `if`/`else` comparisons to check which one it is.
 
-However, repeated `if`/`else` comparisons get quite tedious. Rust has a feature
-that not only makes them nicer to read, but also makes sure that you never
-miss a case. Before we get to that, though, let's talk about another kind of
-enum: one with values.
+However, repeated `if`/`else` comparisons are tedious. Rust has a feature that
+not only makes them nicer to read, but also makes sure that you never miss a
+case. Before we get to that, though, let's talk about another kind of enum: one
+with values.
 
-This enum has two variants, one of which has a value:
+This enum has two variants, one of which "wraps" an int:
 
 ```{rust}
 enum OptionalInt {
@@ -1150,21 +1150,23 @@ enum StringResult {
     ErrorReason(String),
 }
 ```
-Where a `StringResult` is either an `StringOK`, with the result of a computation, or an
-`ErrorReason` with a `String` explaining what caused the computation to fail. These kinds of
-`enum`s are actually very useful and are even part of the standard library.
 
-As you can see `enum`s with values are quite a powerful tool for data representation,
-and can be even more useful when they're generic across types. But before we get to
-generics, let's talk about how to use them with pattern matching, a tool that will
-let us deconstruct this sum type (the type theory term for enums) in a very elegant
-way and avoid all these messy `if`/`else`s.
+Where a `StringResult` is either a `StringOK` with the result of a computation
+or an `ErrorReason` wrapping a `String` explanation of what caused the
+computation to fail. These kinds of `enum`s are very useful and are even part of
+the standard library.
+
+As you can see, `enum`s with values are a powerful tool for data representation,
+and can be even more useful when they're generic across types. Before we get to
+generics, let's talk about how to use them with pattern matching, a tool that
+will let us deconstruct enums in an elegant way that avoids repetitive
+`if`/`else`s.
 
 # Match
 
-Often, a simple `if`/`else` isn't enough, because you have more than two
-possible options. And `else` conditions can get incredibly complicated. So
-what's the solution?
+Often, a simple `if`/`else` isn't enough, because you may have more than two
+possible options. And `else` conditions can get complicated. So what's the
+solution?
 
 Rust has a keyword, `match`, that allows you to replace complicated `if`/`else`
 groupings with something more powerful. Check it out:
@@ -1182,27 +1184,27 @@ match x {
 }
 ```
 
-`match` takes an expression, and then branches based on its value. Each 'arm' of
-the branch is of the form `val => expression`. When the value matches, that arm's
-expression will be evaluated. It's called `match` because of the term 'pattern
-matching,' which `match` is an implementation of.
+`match` takes an expression and branches on its value. Each **arm** of the
+branch is of the form `value => expression`. When the value matches, that arm's
+expression will be evaluated. `match` takes its name from the phrase **pattern
+matching**.
 
 So what's the big advantage here? Well, there are a few. First of all, `match`
-enforces 'exhaustiveness checking.' Do you see that last arm, the one with the
-underscore (`_`)? If we remove that arm, Rust will give us an error:
+enforces **exhaustiveness checking**. Do you see that last arm, the one with the
+`_`? If we remove that arm, Rust will give us an error:
 
 ```{ignore,notrust}
 error: non-exhaustive patterns: `_` not covered
 ```
 
-In other words, Rust is trying to tell us we forgot a value. Because `x` is an
-integer, Rust knows that it can have a number of different values. For example,
-`6i`. But without the `_`, there is no arm that could match, and so Rust refuses
-to compile. `_` is sort of like a catch-all arm. If none of the other arms match,
-the arm with `_` will. And since we have this catch-all arm, we now have an arm
-for every possible value of `x`, and so our program will now compile.
+Rust is telling us we forgot a value. Because `x` is an integer, Rust knows that
+it can have a number of different values. For example, `6i`. But without the
+`_`, there is no arm that could match, so Rust refuses to compile. `_` is a
+catch-all arm. If none of the other arms match, the arm with `_` will. Since we
+have this catch-all arm, we now have an arm for every possible value of `x`, so
+our program will now compile.
 
-`match` statements also destructure enums, as well. Remember this code from the
+`match` statements destructure enums, as well. Remember this code from the
 section on enums?
 
 ```{rust}
@@ -1228,7 +1230,7 @@ fn main() {
 }
 ```
 
-We can re-write this as a `match`:
+We can re-write this using `match`:
 
 ```{rust}
 fn cmp(a: int, b: int) -> Ordering {
@@ -1249,14 +1251,14 @@ fn main() {
 }
 ```
 
-This version has way less noise, and it also checks exhaustively to make sure
-that we have covered all possible variants of `Ordering`. With our `if`/`else`
-version, if we had forgotten the `Greater` case, for example, our program would
-have happily compiled. If we forget in the `match`, it will not. Rust helps us
-make sure to cover all of our bases.
+This version has less noise, and it checks exhaustively to make sure we have
+covered all possible variants of `Ordering`. With our `if`/`else` version, if we
+had forgotten the `Greater` case, for example, our program would have happily
+compiled. If we forget a variant in the `match`, it will not. Rust helps us make
+sure to cover all of our bases.
 
-`match` expressions also allow us to get the values contained in an `enum`
-(also known as destructuring) as follows:
+`match` expressions allow us to get the values contained in an `enum` (also
+known as destructuring) as follows:
 
 ```{rust}
 enum OptionalInt {
@@ -1280,15 +1282,15 @@ fn main() {
 }
 ```
 
-That is how you can get and use the values contained in `enum`s.
-It can also allow us to treat errors or unexpected computations, for example, a
-function that is not guaranteed to be able to compute a result (an `int` here),
-could return an `OptionalInt`, and we would handle that value with a `match`.
-As you can see, `enum` and `match` used together are quite useful!
+It can also allow us to deal with errors or unexpected computations like a
+function that is not guaranteed compute a result (an `int` here). Such a
+function could return an `OptionalInt`, for example, and we would handle the two
+possible values with a `match`.  As you can see, `enum` and `match` used
+together are quite useful!
 
-`match` is also an expression, which means we can use it on the right
-hand side of a `let` binding or directly where an expression is
-used. We could also implement the previous line like this:
+`match` is also an expression, which means we can use it on the right hand side
+of a `let` binding or directly where an expression is used. We could also
+implement the previous line like this:
 
 ```{rust}
 fn cmp(a: int, b: int) -> Ordering {
@@ -1309,7 +1311,7 @@ fn main() {
 }
 ```
 
-Sometimes, it's a nice pattern.
+Sometimes, this is a convenient pattern.
 
 # Looping
 
@@ -1320,15 +1322,7 @@ two main looping constructs: `for` and `while`.
 
 The `for` loop is used to loop a particular number of times. Rust's `for` loops
 work a bit differently than in other systems languages, however. Rust's `for`
-loop doesn't look like this "C style" `for` loop:
-
-```{c}
-for (x = 0; x < 10; x++) {
-    printf( "%d\n", x );
-}
-```
-
-Instead, it looks like this:
+loop looks more like Java's or Python's `for` loops. Take a look:
 
 ```{rust}
 for x in range(0i, 10i) {
@@ -1355,11 +1349,11 @@ In our example, `range` is a function that takes a start and an end position,
 and gives an iterator over those values. The upper bound is exclusive, though,
 so our loop will print `0` through `9`, not `10`.
 
-Rust does not have the "C style" `for` loop on purpose. Manually controlling
+By design, Rust does not have the "C style" `for` loop. Manually controlling
 each element of the loop is complicated and error prone, even for experienced C
 developers.
 
-We'll talk more about `for` when we cover **iterator**s, later in the Guide.
+We'll talk more about `for` when we cover **iterator**s later in the Guide.
 
 ## `while`
 
@@ -1392,12 +1386,12 @@ Rust has a dedicated keyword, `loop`, to handle this case:
 loop {
 ```
 
-Rust's control-flow analysis treats this construct differently than a
-`while true`, since we know that it will always loop. The details of what
-that _means_ aren't super important to understand at this stage, but in
-general, the more information we can give to the compiler, the better it
-can do with safety and code generation. So you should always prefer
-`loop` when you plan to loop infinitely.
+Rust's control-flow analysis treats this construct differently than a `while
+true`, since we know that it will always loop. The details of what that _means_
+aren't important to understand at this stage, but in general, the more
+information we can give to the compiler, the better it can do with safety and
+code generation. So you should always prefer `loop` when you plan to loop
+infinitely.
 
 ## Ending iteration early
 
