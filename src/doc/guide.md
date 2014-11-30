@@ -10,8 +10,8 @@ you do too.
 To show you how to get going with Rust, we're going to write the traditional
 "Hello, World!" program. Next, we'll introduce you to `cargo`, a tool that's
 useful for writing real-world Rust programs and libraries. After that, we'll
-talk about the basics of Rust and write a little program to try them out, and
-then we'll move on to more advanced things.
+talk about the basics of Rust and write a little guessing game to try them out,
+and then we'll move on to more advanced things.
 
 Let's go!
 
@@ -1442,32 +1442,34 @@ Both `continue` and `break` are valid in both kinds of loops.
 # Strings
 
 Strings are an important concept for any programmer to master. Rust's string
-handling system is a bit different than in other languages, due to its systems
-focus. Any time you have a data structure of variable size, things can get
-tricky, and strings are a re-sizable data structure. That said, Rust's strings
-also work differently than in some other systems languages, such as C.
+handling system is a bit different from other languages, even other systems
+languages.
 
 Let's dig into the details. A **string** is a sequence of Unicode scalar values
-encoded as a stream of UTF-8 bytes. All strings are guaranteed to be
-validly encoded UTF-8 sequences. Additionally, strings are not null-terminated
-and can contain null bytes.
+encoded as a stream of UTF-8 bytes. All strings are guaranteed to be valid UTF-8
+encoded sequences. Additionally, strings are _not_ null-terminated (unlike C
+strings) and therefore can contain null bytes.
 
 Rust has two main types of strings: `&str` and `String`.
 
-The first kind is a `&str`. This is pronounced a 'string slice.' String literals
-are of the type `&str`:
+### `&str`
+
+`&str` is pronounced **string slice**. String literals are of the type
+`&str`. Here's an example with the type included:
 
 ```{rust}
-let string = "Hello there.";
+let s: &str = "Hello there.";
 ```
 
-This string is statically allocated, meaning that it's saved inside our
-compiled program, and exists for the entire duration it runs. The `string`
-binding is a reference to this statically allocated string. String slices
-have a fixed size, and cannot be mutated.
+String slices are statically allocated. They're saved inside compiled programs
+and exist for the duration of program execution. `s` above is a reference to a
+statically allocated string. String slices have a fixed size and cannot be
+mutated.
 
-A `String`, on the other hand, is an in-memory string.  This string is
-growable, and is also guaranteed to be UTF-8.
+### The `String` type
+
+A `String`, on the other hand, is a growable, UTF-8 encoded buffer. `String` is
+similar to Java's StringBuilder.
 
 ```{rust}
 let mut s = "Hello".to_string();
@@ -1490,7 +1492,9 @@ fn main() {
 }
 ```
 
-To compare a String to a constant string, prefer `as_slice()`...
+Viewing a `String` as a `&str` is cheap, but converting a `&str` to a `String`
+involves allocating memory. There's no reason to do that unless you have to!
+Therefore, to compare a String to a constant string, prefer `as_slice()`...
 
 ```{rust}
 fn compare(string: String) {
@@ -1504,30 +1508,26 @@ fn compare(string: String) {
 
 ```{rust}
 fn compare(string: String) {
+    // don't do this
     if string == "Hello".to_string() {
         println!("yes");
     }
 }
 ```
 
-Viewing a `String` as a `&str` is cheap, but converting the `&str` to a
-`String` involves allocating memory. No reason to do that unless you have to!
-
-That's the basics of strings in Rust! They're probably a bit more complicated
-than you are used to, if you come from a scripting language, but when the
-low-level details matter, they really matter. Just remember that `String`s
-allocate memory and control their data, while `&str`s are a reference to
-another string, and you'll be all set.
+Those are the basics of strings in Rust. Just remember that `String`s allocate
+memory and control their data, while `&str`s are references to other strings,
+and you'll be all set.
 
 # Arrays, Vectors, and Slices
 
-Like many programming languages, Rust has list types to represent a sequence of
-things. The most basic is the **array**, a fixed-size list of elements of the
-same type. By default, arrays are immutable.
+Like many programming languages, Rust has built-in list types to represent a
+sequence of things. The most basic is the **array**, a fixed-size list of
+elements of the same type.
 
 ```{rust}
-let a = [1i, 2i, 3i];
-let mut m = [1i, 2i, 3i];
+let a = [1i, 2i, 3i]; // immutable
+let mut m = [1i, 2i, 3i]; // mutable
 ```
 
 You can create an array with a given number of elements, all initialized to the
@@ -1559,17 +1559,17 @@ You can access a particular element of an array with **subscript notation**:
 ```{rust}
 let names = ["Graydon", "Brian", "Niko"];
 
-println!("The second name is: {}", names[1]);
+println!("The second name is: {}", names[1]); // "Brian"
 ```
 
-Subscripts start at zero, like in most programming languages, so the first name
+Subscripts start at zero, like most programming languages, so the first name
 is `names[0]` and the second name is `names[1]`. The above example prints
 `The second name is: Brian`. If you try to use a subscript that is not in the
 array, you will get an error: array access is bounds-checked at run-time. Such
 errant access is the source of many bugs in other systems programming
 languages.
 
-A **vector** is a dynamic or "growable" array, implemented as the standard
+A **vector** is a dynamic or growable array and is implemented in by standard
 library type [`Vec<T>`](std/vec/) (we'll talk about what the `<T>` means
 later). Vectors are to arrays what `String` is to `&str`. You can create them
 with the `vec!` macro:
@@ -1579,8 +1579,8 @@ let v = vec![1i, 2, 3];
 ```
 
 (Notice that unlike the `println!` macro we've used in the past, we use square
-brackets `[]` with `vec!`. Rust allows you to use either in either situation,
-this is just convention.)
+brackets `[]` with `vec!`. Rust allows you to use either in either
+situation---this is just convention.)
 
 You can get the length of, iterate over, and subscript vectors just like
 arrays. In addition, (mutable) vectors can grow automatically:
@@ -1591,7 +1591,8 @@ nums.push(4);
 println!("The length of nums is now {}", nums.len());   // Prints 4
 ```
 
-Vectors have many more useful methods.
+Vectors have many more useful methods. Read up on [`Vec`](std/vec/) in the
+API documentation.
 
 A **slice** is a reference to (or "view" into) an array. They are useful for
 allowing safe, efficient access to a portion of an array without copying. For
@@ -1613,10 +1614,10 @@ You can also take a slice of a vector, `String`, or `&str`, because they are
 backed by arrays. Slices have type `&[T]`, which we'll talk about when we cover
 generics.
 
-We have now learned all of the most basic Rust concepts. We're ready to start
-building our guessing game, we just need to know one last thing: how to get
-input from the keyboard. You can't have a guessing game without the ability to
-guess!
+We have now learned all of the most basic Rust concepts. We're almost ready to
+start building our guessing game. We just need to know one last thing: how to
+get input from the keyboard. You can't have a guessing game without the ability
+to guess!
 
 # Standard Input
 
